@@ -1,0 +1,65 @@
+
+name: CADCraft Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "cadcraft-source-1.zip"
+      - ".github/workflows/android-apk.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar herramientas
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: android-actions/setup-android@v3
+
+      - uses: android-actions/setup-ndk@v3
+        with:
+          ndk-version: 27.2.12479018
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android
+
+      - name: Instalar cargo-apk
+        run: cargo install cargo-apk --locked
+
+      - name: Extraer código fuente
+        run: |
+          mkdir source
+          unzip -q cadcraft-source-1.zip -d source
+          find source -name Cargo.toml -print
+
+      - name: Compilar CADCraft para Android
+        shell: bash
+        run: |
+          MANIFEST=$(find source -path '*/apps/cadcraft-android/Cargo.toml' -print -quit)
+          if [ -z "$MANIFEST" ]; then
+            echo "No se encontró el proyecto Android"
+            exit 1
+          fi
+          APP_DIR="${MANIFEST%/apps/cadcraft-android/Cargo.toml}"
+          cd "$APP_DIR"
+          cargo apk build --package cadcraft-android --release --target aarch64-linux-android
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: CADCraft-Android-APK-experimental
+          path: source/**/target/**/*.apk
+          if-no-files-found: error
+          retention-days: 14
