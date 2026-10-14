@@ -32,13 +32,12 @@ jobs:
         with:
           packages: platform-tools
 
-      
-      
       - name: Instalar plataformas y NDK
         shell: bash
         run: |
-          yes | sdkmanager --licenses
+          sdkmanager --licenses </dev/null || true
           sdkmanager "platforms;android-35" "build-tools;35.0.0" "ndk;27.2.12479018"
+
 
       - uses: dtolnay/rust-toolchain@stable
         with:
