@@ -32,11 +32,13 @@ jobs:
         with:
           packages: platform-tools
 
+      
       - name: Instalar plataformas y NDK
+        shell: bash
         run: |
+          yes | sdkmanager --licenses
           sdkmanager "platforms;android-35" "build-tools;35.0.0" "ndk;27.2.12479018"
           
-        uses: android-actions/setup-android@v3
         with:
           packages: |
             platform-tools
