@@ -45,8 +45,8 @@ jobs:
         with:
           targets: aarch64-linux-android
 
-      - name: Instalar cargo-apk
-        run: cargo install cargo-apk --locked
+      - name: Instalar cargo-apk2
+        run: cargo install cargo-apk2 --locked
 
       - name: Extraer código fuente
         run: |
@@ -64,7 +64,7 @@ jobs:
           fi
           APP_DIR="${MANIFEST%/apps/cadcraft-android/Cargo.toml}"
           cd "$APP_DIR"
-          cargo apk build --package cadcraft-android --release --target aarch64-linux-android
+          cargo apk2 build --package cadcraft-android --release --target aarch64-linux-android
 
       - name: Guardar APK
         uses: actions/upload-artifact@v4
